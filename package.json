@@ -12,7 +12,6 @@
     "@remotion/cli": "4.0.533",
     "@remotion/google-fonts": "4.0.533",
     "@remotion/transitions": "4.0.533",
-    "@rspack/binding-darwin-arm64": "1.7.11",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "remotion": "4.0.533"
