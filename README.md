@@ -1,43 +1,56 @@
-# Codex × Remotion AI Video
+# 此刻 · Current News
 
-一个面向抖音、视频号和 Reels 的竖屏短视频模板。使用 React + Remotion 把文案、品牌色和动效变成可编程视频，适合作为 Codex 辅助创作的起点。
+综合新闻聚合网站。默认连接 **中国新闻网、IT之家、联合国新闻** 的 11 个官方 RSS 订阅，覆盖国内、国际、财经、科技、社会、体育、文娱、健康、教育、生活。无需 API 密钥。
 
-## 效果
-
-- 1080 × 1920，30 FPS，12 秒
-- 四段式节奏：钩子、工作流、代码感展示、行动号召
-- 中文字体、品牌色、标题均可参数化
-- 无需图片素材，克隆后即可预览和渲染
-
-## 开始使用
+## 启动
 
 ```bash
 npm install
 npm run dev
 ```
 
-在 Remotion Studio 中打开 `AiCreatorLaunch`。修改 `src/Root.tsx` 的 `defaultProps` 即可替换品牌、标题和强调色。
+访问 http://localhost:3000。旧的 `/AiCreatorLaunch` 地址也会显示新闻页面。
 
-## 渲染 MP4
+## 功能
 
-```bash
-npm run render
-```
+- 分类、来源、关键词与时间范围组合筛选。
+- 新闻原文链接、来源摘要、发布时间；按发布时间排序与去重。
+- 收藏到当前浏览器（最多 200 条），支持再次阅读。
+- 页面每分钟检查，后端订阅缓存两分钟；手动刷新最短间隔 30 秒。
+- 并发请求合并、12 秒来源超时、失败时保留本次运行期间的缓存。
+- 来源面板分别显示获取时间、最新报道时间、连接或缓存状态。
 
-成片输出到 `out/ai-creator-launch.mp4`。
+“全部新闻”指所接入来源的新闻，不是互联网所有报道。新闻源自行决定发布频率，不能保证秒级实时；不会把获取时间当作新闻发布时间。失效订阅不会被模拟新闻替换。
 
-## 用 Codex 继续创作
+## 数据服务选择
 
-可以直接描述下一支视频，例如：
+- 中国新闻网官方 RSS 目录：https://www.chinanews.com.cn/rss/
+- IT之家：https://www.ithome.com/rss/
+- 联合国新闻中文：https://news.un.org/feed/subscribe/zh/news/all/rss.xml
+- NewsAPI 文档：https://newsapi.org/docs ，免费开发套餐有 24 小时延迟且不适用于生产，所以本项目未启用。
+- 36氪订阅测试返回验证页面，未作为可用源接入。
 
-> 把视频改成 15 秒，主题换成新品发布，主色用橙色，第二幕增加三个产品卖点。
+只展示来源提供的标题、短摘要、图片和原文链接，不存储或重新发布文章全文。内容版权归原媒体所有；公开商业部署前需自行确认各来源的使用条款。
 
-## 技术栈
+## 开发
 
-- Remotion 4
-- React 19
-- TypeScript
+`npm test` 验证 RSS / Atom 解析、时间处理、缓存、去重和失败状态。
+`npm run typecheck` 检查类型；`npm run build` 构建页面。
 
-## License
+- `news-service.mjs`：来源配置与聚合服务。
+- `server.mjs`：本地服务，`GET /api/news` 和 `GET /api/health`。
+- `src/news/`：新闻网站界面。
+- 原视频源码仍保留在 `src/video` 与 `src/web`，但不再作为网站入口。
 
-MIT
+服务监听本机 `127.0.0.1:3000`，RSS 请求来自本机服务端，需要网络可访问来源。
+# 财经子栏目、热点与站内阅读
+
+财经支持“全部财经 / 财联社 / 中新网财经”。财联社取自公开首页热门资讯摘要，并非实时电报。
+新闻标题进入本站 `/news/:id`，只展示来源摘要，不复制全文；原文链接为次要入口。浏览器保留最近 600 条摘要，超出当前来源范围且未缓存的链接会显示不可用。
+
+热点入口为 `/hot`，财联社热门可直接使用。X 和 YouTube 为官方 API 可选接入：将 `.env.example` 复制为 `.env`，填写密钥后重启服务。密钥仅由服务端读取。
+- X：`X_BEARER_TOKEN`，需具备 [趋势接口权限](https://docs.x.com/x-api/trends/trends-by-woeid/introduction)。
+- YouTube：`YOUTUBE_API_KEY`，启用 YouTube Data API v3；[mostPopular](https://developers.google.com/youtube/v3/docs/videos/list) 为美国区域热门视频，当前覆盖音乐、影视、游戏，不是综合新闻榜。
+- 微博：匿名热搜访问被拒绝，当前显示待接入授权数据服务，不提供虚构数据。
+
+热点缓存 2 分钟；独立检查：`node --test upgrade.test.mjs`。
