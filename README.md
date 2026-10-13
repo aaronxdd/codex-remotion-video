@@ -56,7 +56,7 @@ npm run dev
 # GitHub Pages 定时新闻站
 
 线上采用 GitHub Actions 每小时第 17、47 分钟抓取并发布，调度可能延迟。推送 main 或手动运行 Publish news snapshots 也会更新。
-仓库 Settings → Pages → Source 选择 GitHub Actions。网址：https://aaronxdd.github.io/codex-remotion-video/
+仓库 Settings → Pages → Source 选择 GitHub Actions。网址：https://aaronxdd.github.io/current-news/
 
 本地仍运行 Node 实时拉取模式。线上由 `VITE_PAGES=true npm run build` 与 `node snapshot.mjs` 生成静态数据，不依赖在线 Node 服务。详情使用 query 路由，避免 Pages 刷新 404。
 Actions 缓存上次数据：单源失败保留旧新闻并标注 stale；全部来源失败则取消发布，保留上次站点。正文成功结果缓存 24 小时，解析失败回退摘要。配图仅保存来源 URL，并未复制图片文件。
