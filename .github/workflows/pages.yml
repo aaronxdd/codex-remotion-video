@@ -4,7 +4,7 @@ on:
     branches: [main]
   workflow_dispatch:
   schedule:
-    - cron: '17,47 * * * *'
+    - cron: '17 3 * * *'
 permissions:
   contents: read
   pages: write
@@ -36,6 +36,7 @@ jobs:
       - run: npm run build
         env:
           VITE_PAGES: 'true'
+          VITE_API_BASE: 'https://current-news-api.current-news.workers.dev'
       - name: Collect news and article snapshots
         run: node snapshot.mjs
         env:

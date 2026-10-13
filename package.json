@@ -6,9 +6,11 @@
   "description": "此刻 · 综合新闻聚合网站",
   "scripts": {
     "dev": "node server.mjs",
+    "worker:dev": "wrangler dev",
+    "worker:deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit",
     "build": "vite build",
-    "test": "node --test tests/news.test.mjs && node tests/run-news-ui.mjs"
+    "test": "node --test tests/news.test.mjs tests/worker.test.mjs && node tests/run-news-ui.mjs"
   },
   "dependencies": {
     "fast-xml-parser": "5.11.2",
@@ -21,6 +23,7 @@
     "@types/react-dom": "19.2.3",
     "esbuild": "0.28.1",
     "react-test-renderer": "19.2.3",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "wrangler": "^4.149.0"
   }
 }
