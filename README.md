@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-访问 http://localhost:3000。旧的 `/AiCreatorLaunch` 地址也会显示新闻页面。
+访问 http://localhost:3000。
 
 ## 功能
 
@@ -40,7 +40,6 @@ npm run dev
 - `news-service.mjs`：来源配置与聚合服务。
 - `server.mjs`：本地服务，`GET /api/news` 和 `GET /api/health`。
 - `src/news/`：新闻网站界面。
-- 原视频源码仍保留在 `src/video` 与 `src/web`，但不再作为网站入口。
 
 服务监听本机 `127.0.0.1:3000`，RSS 请求来自本机服务端，需要网络可访问来源。
 # 财经子栏目、热点与站内阅读
@@ -54,3 +53,11 @@ npm run dev
 - 微博：匿名热搜访问被拒绝，当前显示待接入授权数据服务，不提供虚构数据。
 
 热点缓存 2 分钟；独立检查：`node --test upgrade.test.mjs`。
+# GitHub Pages 定时新闻站
+
+线上采用 GitHub Actions 每小时第 17、47 分钟抓取并发布，调度可能延迟。推送 main 或手动运行 Publish news snapshots 也会更新。
+仓库 Settings → Pages → Source 选择 GitHub Actions。网址：https://aaronxdd.github.io/current-news/
+
+本地仍运行 Node 实时拉取模式。线上由 `VITE_PAGES=true npm run build` 与 `node snapshot.mjs` 生成静态数据，不依赖在线 Node 服务。详情使用 query 路由，避免 Pages 刷新 404。
+Actions 缓存上次数据：单源失败保留旧新闻并标注 stale；全部来源失败则取消发布，保留上次站点。正文成功结果缓存 24 小时，解析失败回退摘要。配图仅保存来源 URL，并未复制图片文件。
+热点密钥可选配置在仓库 Actions Secrets：X_BEARER_TOKEN、YOUTUBE_API_KEY；缺失时显示待配置，不影响新闻发布。

@@ -3,6 +3,7 @@ out
 dist
 .DS_Store
 *.log
+.snapshot/
 .env
 .env.*
 !.env.example

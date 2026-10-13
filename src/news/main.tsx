@@ -1,3 +1,4 @@
+import {snapshotMode,pageLink,pagePath,newsUrl,hotUrl,articleUrl} from "./transport";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./style.css";
@@ -129,7 +130,7 @@ export function App() {
     inflight.current = true;
     setLoading(true);
     try {
-      const response = await fetch("/api/news" + (force ? "?refresh=1" : ""), {
+      const response = await fetch(newsUrl(force), {
         signal: AbortSignal.timeout(20000),
       });
       const result = await response.json();
@@ -251,7 +252,7 @@ export function App() {
       {saved.some((s) => s.id === a.id) ? "◆" : "◇"}
     </button>
   );
-  const path = window.location?.pathname || "/";
+  const path = pagePath();
   if (path.startsWith("/news/")) return <Detail id={path.slice(6)} articles={[...articles,...saved]} loading={loading} />;
   if (path === "/hot") return <HotPanel />;
   return (
@@ -266,7 +267,7 @@ export function App() {
         </button>
         <div className="side-caption">发现世界的每一面</div>
         <nav>
-          <a className="hot-nav" href="/hot">♨ 热点榜单</a>
+          <a className="hot-nav" href={pageLink("/hot")}>♨ 热点榜单</a>
           {categories.map((c) => (
             <button
               key={c.id}
@@ -336,7 +337,7 @@ export function App() {
           <button
             className={`auto ${auto ? "enabled" : ""}`}
             onClick={() => setAuto(!auto)}
-            title="页面每分钟检查更新，新闻源缓存两分钟"
+            title={snapshotMode ? "检查已发布快照，不会触发服务端抓取" : "页面每分钟检查更新，新闻源缓存两分钟"}
           >
             <i />
             {auto ? "自动刷新" : "已暂停刷新"}
@@ -370,9 +371,10 @@ export function App() {
               </strong>
             </div>
           </div>
+          {snapshotMode && <div className="reading-note">定时快照 · 约每 30 分钟更新，GitHub 调度可能延迟。刷新仅检查已发布数据，图片仍由原来源加载。</div>}
           <div className="overview">
             <div className="live-pill">
-              <i /> LIVE FEED
+              <i /> {snapshotMode ? "NEWS SNAPSHOT" : "LIVE FEED"}
             </div>
             <span>
               已收录 <strong>{articles.length}</strong> 条资讯
@@ -481,7 +483,7 @@ export function App() {
                 <>
                   <article className="hero">
                     <a
-                      href={`/news/${focus.id}`}
+                      href={pageLink(`/news/${focus.id}`)}
                       className="hero-image"
                     >
                       <Picture article={focus} hero />
@@ -501,14 +503,14 @@ export function App() {
                         {mark(focus)}
                       </div>
                       <a
-                        href={`/news/${focus.id}`}
+                        href={pageLink(`/news/${focus.id}`)}
                       >
                         <h2>{focus.title}</h2>
                       </a>
                       {focus.summary && <p>{focus.summary}</p>}
                       <a
                         className="read-original"
-                        href={`/news/${focus.id}`}
+                        href={pageLink(`/news/${focus.id}`)}
                       >
                         查看详情 <span>↗</span>
                       </a>
@@ -530,14 +532,14 @@ export function App() {
                             </time>
                           </div>
                           <a
-                            href={`/news/${a.id}`}
+                            href={pageLink(`/news/${a.id}`)}
                           >
                             <h3>{a.title}</h3>
                           </a>
                           {a.summary && <p>{a.summary}</p>}
                           <div className="item-actions">
                             <a
-                              href={`/news/${a.id}`}
+                              href={pageLink(`/news/${a.id}`)}
                             >
                               查看详情 ↗
                             </a>
@@ -546,7 +548,7 @@ export function App() {
                         </div>
                         <a
                           className="item-image"
-                          href={`/news/${a.id}`}
+                          href={pageLink(`/news/${a.id}`)}
                           aria-label={a.title}
                         >
                           <Picture article={a} />
@@ -577,7 +579,7 @@ export function App() {
                   {articles.slice(0, 5).map((a) => (
                     <a
                       key={a.id}
-                      href={`/news/${a.id}`}
+                      href={pageLink(`/news/${a.id}`)}
                     >
                       <time>{time(a.publishedAt)}</time>
                       <h3>{a.title}</h3>
@@ -627,7 +629,7 @@ export function App() {
                 </button>
               </section>
               <div className="rail-note">
-                每 2 分钟同步订阅源
+                {snapshotMode ? "约每 30 分钟发布新闻快照（可能延迟）" : "每 2 分钟同步订阅源"}
                 <br />
                 新闻时效取决于来源发布频率
                 <br />
@@ -707,3 +709,4 @@ export function App() {
 }
 const root = document.getElementById("root");
 if (root) createRoot(root).render(<App />);
+
