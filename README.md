@@ -65,7 +65,7 @@ npx wrangler login
 npm run worker:deploy
 ```
 
-生产入口为 `https://xuyunxi.top/current-news/`，根路径会自动跳转到新闻站。Cloudflare Worker 缓存并代理 GitHub Pages 静态文件，同时在同一域名的 `/api/*` 提供实时新闻。备用 Worker 地址仍为 `https://current-news-api.current-news.workers.dev`。
+生产入口包括新闻站 `https://xuyunxi.top/current-news/` 和资金罗盘 `https://xuyunxi.top/fundflow/`，根路径会自动跳转到新闻站。Cloudflare Worker 缓存并代理两个 GitHub Pages 静态站点，同时在同一域名的 `/api/*` 提供实时新闻。备用 Worker 地址仍为 `https://current-news-api.current-news.workers.dev`。
 
 热点密钥通过 Worker Secret 保存，不要写入仓库：
 

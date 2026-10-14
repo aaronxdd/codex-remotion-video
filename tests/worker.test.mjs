@@ -44,3 +44,13 @@ test("Worker 将根路径跳转到新闻站", async () => {
   assert.equal(response.status, 302);
   assert.equal(response.headers.get("Location"), "https://xuyunxi.top/current-news/");
 });
+
+test("Worker 规范化资金罗盘路径", async () => {
+  const response = await handle(
+    new Request("https://xuyunxi.top/fundflow"),
+    env,
+    cache,
+  );
+  assert.equal(response.status, 302);
+  assert.equal(response.headers.get("Location"), "https://xuyunxi.top/fundflow/");
+});

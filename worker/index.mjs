@@ -36,9 +36,10 @@ function cors(request, env) {
   };
 }
 
-async function proxyPages(request) {
+async function proxyPages(request, upstreamPath = null) {
   const url = new URL(request.url);
-  const upstream = new URL(url.pathname + url.search, "https://aaronxdd.github.io");
+  const pathname = upstreamPath || url.pathname;
+  const upstream = new URL(pathname + url.search, "https://aaronxdd.github.io");
   const response = await fetch(upstream, {
     headers: {Accept: request.headers.get("Accept") || "*/*"},
     cf: {cacheEverything: true, cacheTtl: 300},
@@ -81,6 +82,13 @@ export async function handle(request, env, cache = caches.default) {
     (url.pathname === "/current-news" || url.pathname.startsWith("/current-news/"))
   )
     return proxyPages(request);
+  if (request.method === "GET" && url.pathname === "/fundflow")
+    return Response.redirect(new URL("/fundflow/", url), 302);
+  if (request.method === "GET" && url.pathname.startsWith("/fundflow/"))
+    return proxyPages(
+      request,
+      url.pathname.replace(/^\/fundflow\//, "/sector-fundflow/"),
+    );
 
   const corsHeaders = cors(request, env);
   if (!corsHeaders) return json({error: "不允许的来源"}, 403);
