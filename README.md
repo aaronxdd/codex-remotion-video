@@ -65,7 +65,7 @@ npx wrangler login
 npm run worker:deploy
 ```
 
-当前生产 Worker 地址为 `https://current-news-api.current-news.workers.dev`，已配置在 Pages 工作流的 `VITE_API_BASE` 中。部署 Worker 后推送 main，Pages 构建会把这个公开 API 地址写入前端。Worker 的 `ALLOWED_ORIGIN` 默认允许 `https://aaronxdd.github.io`；如果 Worker 地址或 Pages 域名变化，请同步修改工作流或 `wrangler.jsonc`。
+生产入口为 `https://xuyunxi.top/current-news/`，根路径会自动跳转到新闻站。Cloudflare Worker 缓存并代理 GitHub Pages 静态文件，同时在同一域名的 `/api/*` 提供实时新闻。备用 Worker 地址仍为 `https://current-news-api.current-news.workers.dev`。
 
 热点密钥通过 Worker Secret 保存，不要写入仓库：
 

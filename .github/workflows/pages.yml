@@ -36,7 +36,7 @@ jobs:
       - run: npm run build
         env:
           VITE_PAGES: 'true'
-          VITE_API_BASE: 'https://current-news-api.current-news.workers.dev'
+          VITE_API_BASE: 'https://xuyunxi.top'
       - name: Collect news and article snapshots
         run: node snapshot.mjs
         env:

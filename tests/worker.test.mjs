@@ -34,3 +34,13 @@ test("Worker 拒绝未授权网页和非 GET 请求", async () => {
   );
   assert.equal(method.status, 405);
 });
+
+test("Worker 将根路径跳转到新闻站", async () => {
+  const response = await handle(
+    new Request("https://xuyunxi.top/"),
+    env,
+    cache,
+  );
+  assert.equal(response.status, 302);
+  assert.equal(response.headers.get("Location"), "https://xuyunxi.top/current-news/");
+});

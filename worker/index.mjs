@@ -19,6 +19,9 @@ function cors(request, env) {
   const origin = request.headers.get("Origin");
   const allowed = new Set([
     env.ALLOWED_ORIGIN || "https://aaronxdd.github.io",
+    "https://aaronxdd.github.io",
+    "https://xuyunxi.top",
+    "https://www.xuyunxi.top",
     "http://127.0.0.1:3000",
     "http://localhost:3000",
   ]);
@@ -31,6 +34,20 @@ function cors(request, env) {
     "Access-Control-Max-Age": "86400",
     Vary: "Origin",
   };
+}
+
+async function proxyPages(request) {
+  const url = new URL(request.url);
+  const upstream = new URL(url.pathname + url.search, "https://aaronxdd.github.io");
+  const response = await fetch(upstream, {
+    headers: {Accept: request.headers.get("Accept") || "*/*"},
+    cf: {cacheEverything: true, cacheTtl: 300},
+  });
+  const headers = new Headers(response.headers);
+  headers.set("Cache-Control", "public, max-age=300, s-maxage=3600");
+  headers.set("X-Content-Type-Options", "nosniff");
+  headers.delete("Content-Security-Policy");
+  return new Response(response.body, {status: response.status, headers});
 }
 
 async function load(pathname, url, env) {
@@ -56,6 +73,15 @@ async function load(pathname, url, env) {
 }
 
 export async function handle(request, env, cache = caches.default) {
+  const url = new URL(request.url);
+  if (request.method === "GET" && url.pathname === "/")
+    return Response.redirect(new URL("/current-news/", url), 302);
+  if (
+    request.method === "GET" &&
+    (url.pathname === "/current-news" || url.pathname.startsWith("/current-news/"))
+  )
+    return proxyPages(request);
+
   const corsHeaders = cors(request, env);
   if (!corsHeaders) return json({error: "不允许的来源"}, 403);
   if (request.method === "OPTIONS")
@@ -63,7 +89,6 @@ export async function handle(request, env, cache = caches.default) {
   if (request.method !== "GET")
     return json({error: "仅支持 GET 请求"}, 405, corsHeaders);
 
-  const url = new URL(request.url);
   const isHealth = url.pathname === "/api/health";
   const forced = url.pathname === "/api/news" && url.searchParams.get("refresh") === "1";
   const ttl = url.pathname.startsWith("/api/article/") ? 600 : 120;
